@@ -3,12 +3,12 @@ from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
    def test_props_to_html(self):
-      node = HTMLNode("a", "great link", None, {"lang": "en", "src": "www.googleawho.com", "target": "_blank"})
-      expected = ' lang="en" src="www.googleawho.com" target="_blank"'
+      node = HTMLNode("a", "great link", None, {"lang": "en", "href": "www.googleawho.com", "target": "_blank"})
+      expected = ' lang="en" href="www.googleawho.com" target="_blank"'
       self.assertEqual(expected, node.props_to_html())
 
    def test_repr(self):
-      children = [HTMLNode("a", "great link", None, {"src": "www.yahoo.com"})]
+      children = [HTMLNode("a", "great link", None, {"href": "www.yahoo.com"})]
       node = HTMLNode("p", "awesome paragraph", children, None)
       expected = f'HTMLNode(p, awesome paragraph, {children}, None)'
       self.assertEqual(expected, repr(node))
@@ -33,8 +33,8 @@ class TestLeafNode(unittest.TestCase):
       self.assertEqual(node.to_html(), "hi world")
 
    def test_leaf_to_html_a(self):
-      node = LeafNode("a", "link to stuff", {"src":"https://www.greatlink.com"})
-      expected = '<a src="https://www.greatlink.com">link to stuff</a>'
+      node = LeafNode("a", "link to stuff", {"href":"https://www.greatlink.com"})
+      expected = '<a href="https://www.greatlink.com">link to stuff</a>'
       self.assertEqual(node.to_html(), expected)
 
    def test_leaf_to_html_no_value_with_exception(self):
@@ -57,25 +57,25 @@ class TestParentNode(unittest.TestCase):
 
 
    def test_parent_node_to_html_nested_child(self):
-      child_with_children = ParentNode("div", [LeafNode("a", "a link", {"src": "https://www.linkadoo.net"})])
+      child_with_children = ParentNode("div", [LeafNode("a", "a link", {"href": "https://www.linkadoo.net"})])
       children = [
          LeafNode("p", "great stuff"),
          ParentNode("div", [LeafNode("p", "first p in a div"), LeafNode("p", "second p in a div"), child_with_children]),
       ]
       node = ParentNode("div", children)
-      expected = '<div><p>great stuff</p><div><p>first p in a div</p><p>second p in a div</p><div><a src="https://www.linkadoo.net">a link</a></div></div></div>'
+      expected = '<div><p>great stuff</p><div><p>first p in a div</p><p>second p in a div</p><div><a href="https://www.linkadoo.net">a link</a></div></div></div>'
       self.assertEqual(expected, node.to_html())
 
    def test_parent_node_repr(self):
       self.maxDiff = None
-      child_with_children = ParentNode("div", [LeafNode("a", "a link", {"src": "https://www.linkadoo.net"})])
+      child_with_children = ParentNode("div", [LeafNode("a", "a link", {"href": "https://www.linkadoo.net"})])
       children = [
          LeafNode("p", "great stuff"),
          ParentNode("div", [LeafNode("p", "first p in a div"), LeafNode("p", "second p in a div"), child_with_children]),
       ]
       node = ParentNode("div", children)
 
-      expected_repr_inner_child_with_child = "ParentNode(div, [LeafNode(a, a link, {'src': 'https://www.linkadoo.net'})], None)"
+      expected_repr_inner_child_with_child = "ParentNode(div, [LeafNode(a, a link, {'href': 'https://www.linkadoo.net'})], None)"
       expected_repr_outer_child_with_child = f"ParentNode(div, [LeafNode(p, first p in a div, None), LeafNode(p, second p in a div, None), {expected_repr_inner_child_with_child}], None)"
       expected = f"ParentNode(div, [LeafNode(p, great stuff, None), {expected_repr_outer_child_with_child}], None)"
    
