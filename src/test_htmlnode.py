@@ -81,5 +81,17 @@ class TestParentNode(unittest.TestCase):
    
       self.assertEqual(repr(node), expected)
 
+   def test_parent_node_to_html_no_tag(self):
+      node = ParentNode(None, [LeafNode("p", "hi i'm a leaf")])
+      with self.assertRaises(Exception) as context:
+         node.to_html() 
+      self.assertTrue("parent node requires tag" in str(context.exception))
+
+   def test_parent_node_to_html_no_children(self):
+      node = ParentNode("div", None)
+      with self.assertRaises(Exception) as context:
+         node.to_html() 
+      self.assertTrue("parent node requires children" in str(context.exception))
+
 if __name__ == "__main__":
    unittest.main()
