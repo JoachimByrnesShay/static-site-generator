@@ -9,7 +9,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             continue
         current_nodes = []
         splitted = node.text.split(delimiter)
+        if len(splitted) % 2 == 0:
+            raise ValueError("there is no closing delimiter")
         for ix, node_text in enumerate(splitted):
+            if node_text == "":
+                continue
             if (ix % 2) == 0:
                 current_nodes.append(TextNode(node_text, TextType.TEXT))
             else:

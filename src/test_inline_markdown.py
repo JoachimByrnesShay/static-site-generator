@@ -50,8 +50,36 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
         with_bold_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         with_italic_and_bold_nodes = split_nodes_delimiter(with_bold_nodes, "_", TextType.ITALIC)
-     
-
-
         self.assertEqual(with_italic_and_bold_nodes, expected)
+
+    def test_split_with_no_closing_delimiter(self):
+        node = TextNode("this is a sentence with **bold text in it, ok?", TextType.TEXT)
+        with self.assertRaises(Exception) as context:
+            split_nodes_delimiter([node], "**", TextType.BOLD)
+        
+        self.assertTrue("no closing delimiter" in str(context.exception))
+
+    def test_split_delimiter_at_start(self):
+        node = TextNode("_this_ is a great _italic containing sentence_ to look at", TextType.TEXT)
+        expected = [
+            TextNode("this", TextType.ITALIC),
+            TextNode(" is a great ", TextType.TEXT),
+            TextNode("italic containing sentence", TextType.ITALIC),
+            TextNode(" to look at", TextType.TEXT),
+        ]
+
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
+        self.assertEqual(expected, new_nodes)
+
+    def test_split_delimiter_multiple_bold(self):
+        node = TextNode("this sentence has **this bolded section** and then also has **this other bolded section**, a good way to use bold inside of sentences", TextType.TEXT)
+        expected = [
+            TextNode("this sentence has ", TextType.TEXT),
+            TextNode("this bolded section", TextType.BOLD),
+            TextNode(" and then also has ", TextType.TEXT),
+            TextNode("this other bolded section", TextType.BOLD),
+            TextNode(", a good way to use bold inside of sentences", TextType.TEXT),
+        ]
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(expected, new_nodes)
 
