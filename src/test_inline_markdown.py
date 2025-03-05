@@ -115,3 +115,15 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         expected = [("to yahoo because it is good and has a great yet highly suspect name", "https://www.yahoo.com")]
         result = extract_markdown_links(text)
         self.assertListEqual(result, expected)
+
+    def test_extract_markdown_two_links(self):
+        text = "this is a great text with a link [to yahoo because it is good and has a great yet highly suspect name](https://www.yahoo.com), just in case you need the link, and [another link to nowhere](https://www.road-to-nowhere.com)"
+        expected = [("to yahoo because it is good and has a great yet highly suspect name", "https://www.yahoo.com"), ("another link to nowhere", "https://www.road-to-nowhere.com")]
+        result = extract_markdown_links(text)
+        self.assertListEqual(result, expected)
+
+    def test_extract_markdown_ignores_images(self):
+        text = "here is more text with a proper link [to cnn](https://www.cnn.com) as well as an image of ![a cat chasing dust](https://www.cats.com/Rjc4U/craziest_cat_is_it_ok.jpg)"
+        expected = [("to cnn", "https://www.cnn.com")]
+        result = extract_markdown_links(text)
+        self.assertListEqual(result, expected)
