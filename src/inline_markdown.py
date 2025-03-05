@@ -33,7 +33,7 @@ def extract_markdown_links(text):
     return result
     
 
-text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and [obi wan](https://www.obiwan.com/bio)"
+text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://www.obiwan.com/bio)"
 print(extract_markdown_images(text))
 
 print(extract_markdown_links(text))

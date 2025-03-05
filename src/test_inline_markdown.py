@@ -1,5 +1,5 @@
 import unittest
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images
 from textnode import TextNode, TextType 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -83,3 +83,35 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         self.assertEqual(expected, new_nodes)
 
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_extract_markdown_two_images(self):
+        text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and with another ![image2](https://i.imgur.com/gqhjfsF.png)"
+        expected = [("image", "https://i.imgur.com/zjjcJKZ.png"), ("image2", "https://i.imgur.com/gqhjfsF.png" )]
+        result = extract_markdown_images(text)
+        self.assertListEqual(result, expected)
+
+    def test_extract_markdown_two_images_and_one_line(self):
+        text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and with another ![image2](https://i.imgur.com/gqhjfsF.png) and [a link](https://www.google.com/badwaytogo)" 
+        expected = [("image", "https://i.imgur.com/zjjcJKZ.png"), ("image2", "https://i.imgur.com/gqhjfsF.png" )]
+        result = extract_markdown_images(text)
+        self.assertListEqual(result, expected)
+
+    def test_extract_markdown_images_with_content_between_groups(self):
+        text = "This is text with an ![image]apples(https://i.imgur.com/zjjcJKZ.png) and with another ![image2](https://i.imgur.com/gqhjfsF.png)"
+        expected = [("image2", "https://i.imgur.com/gqhjfsF.png" )]
+        result = extract_markdown_images(text)
+        self.assertListEqual(result, expected)
+
+
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_extract_markdown_links(self):
+        text = "this is a great text with a link [to yahoo because it is good and has a great yet highly suspect name](https://www.yahoo.com), just in case you need the link"
+        expected = [("to yahoo because it is good and has a great yet highly suspect name", "https://www.yahoo.com")]
+        result = extract_markdown_links(text)
+        self.assertListEqual(result, expected)
