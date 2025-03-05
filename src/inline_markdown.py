@@ -1,3 +1,4 @@
+import re
 from textnode import TextNode, TextType 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
@@ -21,13 +22,20 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         new_nodes.extend(current_nodes) 
     return new_nodes
 
+def extract_markdown_images(text):
+    pattern = r"!\[([^\[^\].]+)\]?\((http[s]?://.+?)\)"
+    result = re.findall(pattern, text)
+    return result
+
+def extract_markdown_links(text):
+    pattern = r"[^!]\[([^\[^\].]+)\]?\((http[s]?://.+?)\)"
+    result = re.findall(pattern, text)
+    return result
+    
+
+text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and [obi wan](https://www.obiwan.com/bio)"
+print(extract_markdown_images(text))
+
+print(extract_markdown_links(text))
 
 
-# node = TextNode("This is text with a `code block` word", TextType.TEXT)
-# new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-# print(new_nodes)
-# expected = [
-#     TextNode("This is text with a ", TextType.TEXT),
-#     TextNode("code block", TextType.CODE),
-#     TextNode(" word", TextType.TEXT),
-# ]
