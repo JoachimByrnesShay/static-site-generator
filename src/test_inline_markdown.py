@@ -1,5 +1,5 @@
 import unittest
-from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images
+from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images, split_nodes_link
 from textnode import TextNode, TextType 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -127,3 +127,25 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         expected = [("to cnn", "https://www.cnn.com")]
         result = extract_markdown_links(text)
         self.assertListEqual(result, expected)
+
+
+class TestSplitNodesLinks(unittest.TestCase):
+    def test_split_links(self):
+        node = TextNode(
+            "This is text with a link [to a building](https://www.building.com) and another link [to water](https://www.water.com/blue)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected =  [
+                TextNode("This is text with a link ", TextType.TEXT),
+                TextNode("to a building", TextType.LINK, "https://www.building.com"),
+                TextNode(" and another link ", TextType.TEXT),
+                TextNode(
+                    "to water", TextType.LINK, "https://www.water.com/blue"
+                ),
+            ]
+        
+        self.assertListEqual(
+            expected,
+            new_nodes,
+        )
