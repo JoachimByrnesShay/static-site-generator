@@ -39,10 +39,14 @@ def split_nodes_image(old_nodes):
     for i, node in enumerate(old_nodes):
         if not node.text_type is TextType.TEXT:
             new_nodes.append(node) 
+            continue
         nodes_from_current_node = []
         text =node.text 
         extracted_images = extract_markdown_images(node.text)
-
+        if not extracted_images:
+            new_nodes.append(node)
+            continue
+        
         for j in range(0,len(extracted_images)):
             split_on = f"![{extracted_images[j][0]}]({extracted_images[j][1]})"
             splitted = text.split(split_on)
@@ -60,11 +64,14 @@ def split_nodes_link(old_nodes):
     for i, node in enumerate(old_nodes):
         if not node.text_type is TextType.TEXT:
             new_nodes.append(node) 
+            continue
         nodes_from_current_node = []
         text =node.text 
         extracted_links = extract_markdown_links(node.text)
         if not extracted_links:
-            return new_nodes
+            new_nodes.append(node)
+            continue
+        
         for j in range(0,len(extracted_links)):
             split_on = f"[{extracted_links[j][0]}]({extracted_links[j][1]})"
             splitted = text.split(split_on)
