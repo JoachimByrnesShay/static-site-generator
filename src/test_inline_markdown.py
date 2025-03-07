@@ -1,5 +1,5 @@
 import unittest
-from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images, split_nodes_link
+from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images, split_nodes_link, split_nodes_image
 from textnode import TextNode, TextType 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -132,7 +132,7 @@ class TestExtractMarkdownLinks(unittest.TestCase):
 class TestSplitNodesLinks(unittest.TestCase):
     def test_split_links(self):
         node = TextNode(
-            "This is text with a link [to a building](https://www.building.com) and another link [to water](https://www.water.com/blue)",
+            "This is text with a link [to a building](https://www.building.com) and another link [to water](https://www.water.com/blue) and I am keeping the other link for later",
             TextType.TEXT,
         )
         new_nodes = split_nodes_link([node])
@@ -143,9 +143,61 @@ class TestSplitNodesLinks(unittest.TestCase):
                 TextNode(
                     "to water", TextType.LINK, "https://www.water.com/blue"
                 ),
+                TextNode(" and I am keeping the other link for later", TextType.TEXT)
             ]
         
         self.assertListEqual(
             expected,
             new_nodes,
         )
+
+    def test_split_link_at_start_of_text(self):
+        node = TextNode(
+            "[crooks](https://www.doodle.com) is one link, and another is [old and from afar](https://www.pretendbewizard.com)",
+            TextType.TEXT
+        )
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("crooks", TextType.LINK, "https://www.doodle.com"),
+            TextNode(" is one link, and another is ", TextType.TEXT),
+            TextNode("old and from afar", TextType.LINK, "https://www.pretendbewizard.com"),
+        ]
+        self.assertListEqual(
+            expected,
+            new_nodes,
+        )
+
+
+class TestSplitNodesImages(unittest.TestCase):
+   
+    def test_split_images(self):
+        self.maxDiff = None
+        node =  TextNode(
+            "This is text with an image of ![a bad cat](https://www.badcats.com/cat905/xs7IfJ1/cat-on-grandmas-head.jpg) and another image of ![deep water](https://www.typesofwaterimages.com/deep/fJ4xy/not-shallow59.png). Is that OK?",
+            TextType.TEXT,
+        )
+        expected = [
+            TextNode("This is text with an image of ", TextType.TEXT),
+            TextNode("a bad cat", TextType.IMAGE, "https://www.badcats.com/cat905/xs7IfJ1/cat-on-grandmas-head.jpg"),
+            TextNode(" and another image of ", TextType.TEXT),
+            TextNode("deep water", TextType.IMAGE, "https://www.typesofwaterimages.com/deep/fJ4xy/not-shallow59.png"),
+            TextNode(". Is that OK?", TextType.TEXT),
+        ]
+        result = split_nodes_image([node])
+
+        self.assertListEqual(expected, result)
+
+    def test_split_image_at_start_of_text(self):
+        self.maxDiff = None 
+        node = TextNode(
+            "![an image](https://isnotwhatitlookslike.com/no) is a cool page if not as attractive as ![professor's kept harem](https://www.hotdogs.com/terrier-and-afghan-hound.jpg)", TextType.TEXT
+        )
+        expected = [
+            TextNode("an image", TextType.IMAGE, "https://isnotwhatitlookslike.com/no"),
+            TextNode(" is a cool page if not as attractive as ", TextType.TEXT),
+            TextNode("professor's kept harem", TextType.IMAGE, "https://www.hotdogs.com/terrier-and-afghan-hound.jpg"),
+        ]
+        result = split_nodes_image([node])
+
+        self.assertListEqual(expected, result)
+
