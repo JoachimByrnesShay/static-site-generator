@@ -167,6 +167,17 @@ class TestSplitNodesLinks(unittest.TestCase):
             new_nodes,
         )
 
+    def test_split_only_an_link(self):
+        node = TextNode(
+            "[a link](https://www.maynotbeobvious.com)", TextType.TEXT
+        )
+        expected = [
+            TextNode("a link", TextType.LINK, "https://www.maynotbeobvious.com"),
+        ]
+        result = split_nodes_link([node])
+
+        self.assertListEqual(expected, result)
+
 
 class TestSplitNodesImages(unittest.TestCase):
    
@@ -201,3 +212,13 @@ class TestSplitNodesImages(unittest.TestCase):
 
         self.assertListEqual(expected, result)
 
+    def test_split_only_an_image(self):
+        node = TextNode(
+            "![an image](https://isnotwhatitlookslike.com/noitisnt)", TextType.TEXT
+        )
+        expected = [
+            TextNode("an image", TextType.IMAGE, "https://isnotwhatitlookslike.com/noitisnt"),
+        ]
+        result = split_nodes_image([node])
+
+        self.assertListEqual(expected, result)
