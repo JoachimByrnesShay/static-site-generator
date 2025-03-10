@@ -1,5 +1,6 @@
 import unittest
-from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images, split_nodes_link, split_nodes_image
+from inline_markdown import split_nodes_delimiter, extract_markdown_links, \
+extract_markdown_images, split_nodes_link, split_nodes_image, text_to_textnodes
 from textnode import TextNode, TextType 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -80,6 +81,12 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextNode("this other bolded section", TextType.BOLD),
             TextNode(", a good way to use bold inside of sentences", TextType.TEXT),
         ]
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertEqual(expected, new_nodes)
+    
+    def test_split_delimiter_bold_with_no_bold(self):
+        node = TextNode("this sentence has no bolded section and then also has no other bolded section, a good way to use bold inside of sentences", TextType.TEXT)
+        expected = [node]
         new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
         self.assertEqual(expected, new_nodes)
 
@@ -222,3 +229,23 @@ class TestSplitNodesImages(unittest.TestCase):
         result = split_nodes_image([node])
 
         self.assertListEqual(expected, result)
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_basic_case(self):
+        input = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+
+        result = text_to_textnodes(input)
+        self.assertListEqual(result, expected)
