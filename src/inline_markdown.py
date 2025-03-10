@@ -34,52 +34,58 @@ def extract_markdown_links(text):
     
 
 def split_nodes_image(old_nodes):
-
     new_nodes = []
-    for i, node in enumerate(old_nodes):
+    for node in old_nodes:
         if not node.text_type is TextType.TEXT:
             new_nodes.append(node) 
             continue
+
         nodes_from_current_node = []
         text =node.text 
         extracted_images = extract_markdown_images(node.text)
+
         if not extracted_images:
             new_nodes.append(node)
             continue
         
-        for j in range(0,len(extracted_images)):
-            split_on = f"![{extracted_images[j][0]}]({extracted_images[j][1]})"
+        for image in extracted_images:
+            split_on = f"![{image[0]}]({image[1]})"
             splitted = text.split(split_on)
             if splitted[0] != "":
                 nodes_from_current_node.append(TextNode(splitted[0], TextType.TEXT))
-            nodes_from_current_node.append(TextNode(extracted_images[j][0], TextType.IMAGE,extracted_images[j][1]))
+            nodes_from_current_node.append(TextNode(image[0], TextType.IMAGE, image[1]))
             text = splitted[1]
         if text:
             nodes_from_current_node.append(TextNode(text, TextType.TEXT))
         new_nodes.extend(nodes_from_current_node)
+
     return new_nodes
+
 
 def split_nodes_link(old_nodes):
     new_nodes = []
-    for i, node in enumerate(old_nodes):
+    for node in old_nodes:
         if not node.text_type is TextType.TEXT:
             new_nodes.append(node) 
             continue
+
         nodes_from_current_node = []
-        text =node.text 
+        text = node.text 
         extracted_links = extract_markdown_links(node.text)
+
         if not extracted_links:
             new_nodes.append(node)
             continue
         
-        for j in range(0,len(extracted_links)):
-            split_on = f"[{extracted_links[j][0]}]({extracted_links[j][1]})"
+        for link in extracted_links:
+            split_on = f"[{link[0]}]({link[1]})"
             splitted = text.split(split_on)
             if splitted[0] != "":
                 nodes_from_current_node.append(TextNode(splitted[0], TextType.TEXT))
-            nodes_from_current_node.append(TextNode(extracted_links[j][0], TextType.LINK,extracted_links[j][1]))
+            nodes_from_current_node.append(TextNode(link[0], TextType.LINK, link[1]))
             text = splitted[1]
         if text:
             nodes_from_current_node.append(TextNode(text, TextType.TEXT))
         new_nodes.extend(nodes_from_current_node)
+       
     return new_nodes
