@@ -23,7 +23,6 @@ class Block():
         splitted = self.block_text.splitlines() 
         for line in splitted:
             if not re.search('^#{1,6} .+', line):
-                print('it isnt')
                 return False 
         return True
 
@@ -71,7 +70,4 @@ def block_to_block_type(md_block):
         return BlockType.PARAGRAPH
 
 
-test2 = r"###### great stuff"
-test1 = "```var b = 500;var c = 1000; console.log(b + c);```"
-print(block_to_block_type(test2))
 
