@@ -66,7 +66,7 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(BlockType.CODE, result)
 
     def test_block_to_blocktype_basic_quote(self):
-        md_block = "> the loud orator may not be eloquent\n> the soft one you cannot hear\n>why does the flying bird weep for my heart\n>-- <cite>Gu Goh 1245 abrms dynasty<cite>"
+        md_block = "> the loud orator may not be eloquent\n> the soft one you cannot hear\n>why does the soaring bird weep for my heart\n>-- <cite>Gu Goh 1245 abrms dynasty<cite>"
         result = block_to_block_type(md_block)
         self.assertEqual(BlockType.QUOTE, result)
 
