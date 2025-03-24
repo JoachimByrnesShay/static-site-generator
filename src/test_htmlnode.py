@@ -40,7 +40,23 @@ class TestLeafNode(unittest.TestCase):
         expected = '<a href="https://www.awesomesite.com/seeithere/101" lang="en" target="_blank">link to good thing</a>'
         result = node.to_html()
         self.assertEqual(expected, result)
+
+    def test_leaf_equal_leaf(self):
+        node1 = LeafNode("a", "link to good thing", {"href": "https://www.awesomesite.com/seeithere/101", "lang": "en", "target": "_blank"})
+        node2 = LeafNode("a", "link to good thing", {"href": "https://www.awesomesite.com/seeithere/101", "lang": "en", "target": "_blank"})
+        self.assertEqual(node1, node2)
+
+    def test_leaf_to_html_raise_error_with_no_value(self):
+        node = LeafNode("a", value=None)
+        with self.assertRaises(Exception) as context:
+            node.to_html()
+            
+        expected = "a leaf node must have a value"
+        result = str(context.exception)
+        self.assertIn(expected, result)
         
+        
+
 
 if __name__ == "__main__":
     unittest.main()
