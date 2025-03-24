@@ -1,5 +1,5 @@
 import unittest 
-from htmlnode import HTMLNode 
+from htmlnode import HTMLNode, LeafNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -26,3 +26,21 @@ class TestHTMLNode(unittest.TestCase):
         expected = ' href="https://www.yahoo.com" target="_blank" rel="noopener noreferrer"'
         result = node1.props_to_html() 
         self.assertEqual(expected, result)
+
+
+class TestLeafNode(unittest.TestCase):
+    def test_leaf_to_html_p(self):
+        node = LeafNode("p", "a simple paragraph")
+        expected = "<p>a simple paragraph</p>"
+        result = node.to_html()
+        self.assertEqual(expected, result)
+
+    def test_leaf_to_html_a(self):
+        node = LeafNode("a", "link to good thing", {"href": "https://www.awesomesite.com/seeithere/101", "lang": "en", "target": "_blank"})
+        expected = '<a href="https://www.awesomesite.com/seeithere/101" lang="en" target="_blank">link to good thing</a>'
+        result = node.to_html()
+        self.assertEqual(expected, result)
+        
+
+if __name__ == "__main__":
+    unittest.main()
