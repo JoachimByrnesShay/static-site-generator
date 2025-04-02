@@ -112,11 +112,33 @@ class TestParentNode(unittest.TestCase):
             parent_node.to_html() 
         
         expected = str(context.exception)
-
         self.assertIn("parent node must have children", expected)
-            
 
-    # to do, test nexted parentnodes, text multiple sibling children, etc 
+    def test_parent_node_nested_and_multiple_children_to_html(self):
+        leaf_node1 = LeafNode("p", "this is a great leaf node")
+        leaf_node2 = LeafNode("p", "this is also a great leaf node")
+        leaf_node3 = LeafNode("p", "this is a really great leaf node")
+        leaf_node4 = LeafNode("p", "this is a really really great leaf node")
+        nested_parent_node1 = ParentNode("div", [leaf_node1, leaf_node2])
+        nested_parent_node2 = ParentNode("div", [leaf_node3, leaf_node4])
+        parent_node = ParentNode("div", [nested_parent_node1, nested_parent_node2])
+        result = parent_node.to_html()
+        expected = "<div><div><p>this is a great leaf node</p><p>this is also a great leaf node</p></div><div><p>this is a really great leaf node</p><p>this is a really really great leaf node</p></div></div>"
+        self.assertEqual(result, expected)
+
+    def test_parent_node_many_children(self):
+        children = [
+            LeafNode(None, "this is a text node"),
+            LeafNode("p", "this is a paragraph node"),
+            LeafNode(None, "this is another text node"),
+            LeafNode("a", "this is a link node", {"href":"https://www.greatlinkhere.com/seeitnow.html"}),
+        ]
+        parent_node = ParentNode("div", children)
+        result = parent_node.to_html() 
+        expected = '<div>this is a text node<p>this is a paragraph node</p>this is another text node<a href="https://www.greatlinkhere.com/seeitnow.html">this is a link node</a></div>'
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
