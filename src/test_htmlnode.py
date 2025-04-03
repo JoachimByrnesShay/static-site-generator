@@ -99,15 +99,14 @@ class TestParentNode(unittest.TestCase):
     def test_parent_node_to_html_raise_exception_no_tag(self):
         child_node = LeafNode("p", "paragraph")
         parent_node = ParentNode(None, [child_node])
-
         with self.assertRaises(Exception) as context:
             parent_node.to_html()
+
         expected = str(context.exception)
         self.assertIn("needs a tag", expected)
 
     def test_parent_node_to_html_raise_exception_no_children(self):
         parent_node = ParentNode("div", [])
-
         with self.assertRaises(Exception) as context:
             parent_node.to_html() 
         
@@ -136,7 +135,7 @@ class TestParentNode(unittest.TestCase):
         parent_node = ParentNode("div", children)
         result = parent_node.to_html() 
         expected = '<div>this is a text node<p>this is a paragraph node</p>this is another text node<a href="https://www.greatlinkhere.com/seeitnow.html">this is a link node</a></div>'
-
+        self.assertEqual(result, expected)
 
 
 

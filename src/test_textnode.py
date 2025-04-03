@@ -1,6 +1,6 @@
 import unittest 
-from textnode import TextType, TextNode 
-
+from textnode import TextType, TextNode, text_node_to_html_node
+from htmlnode import LeafNode 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         node = TextNode("an italic text node", TextType.ITALIC)
@@ -27,6 +27,25 @@ class TestTextNode(unittest.TestCase):
         expected = "TextNode(a great link, link, https://www.yahoo.com)"
         result = repr(node)
         self.assertEqual(expected, result)
+
+class TestTextNodeToHTML(unittest.TestCase):
+    def test_text_node_to_bold_element(self):
+        node = TextNode("do it now", TextType.BOLD)
+        result = text_node_to_html_node(node)
+        expected = LeafNode("b", "do it now")
+        self.assertEqual(result, expected)
+
+    def test_text_node_to_raw_text(self):
+        node = TextNode("raw text", TextType.TEXT)
+        result = text_node_to_html_node(node)
+        expected = LeafNode(None, "raw text")
+        self.assertEqual(result, expected)
+
+    def test_text_node_to_image(self):
+        node = TextNode("a fish", TextType.IMAGE, "https://www.fishpics.com/lakefish/fI4LZx.jpg")
+        result = text_node_to_html_node(node)
+        expected = LeafNode("img", None, {"src": "https://www.fishpics.com/lakefish/fI4LZx.jpg", "alt": "a fish"})
+        self.assertEqual(result, expected)
 
 
 if __name__ == "__main__":
