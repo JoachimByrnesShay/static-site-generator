@@ -28,3 +28,15 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
         self.assertEqual(actual_with_bold_and_italics, expected)
 
+    def test_bold_multiple(self):
+        node = TextNode("This is markdown text with some **bolded text here** and even more **bolded text over here**, ok?", TextType.TEXT)
+        result = split_nodes_delimiter([node], "**", TextType.BOLD)
+        expected = [
+            TextNode("This is markdown text with some ", TextType.TEXT),
+            TextNode("bolded text here", TextType.BOLD),
+            TextNode(" and even more ", TextType.TEXT),
+            TextNode("bolded text over here", TextType.BOLD),
+            TextNode(", ok?", TextType.TEXT)
+        ]
+
+        self.assertEqual(result, expected)
