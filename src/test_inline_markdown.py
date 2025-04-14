@@ -1,6 +1,6 @@
 import unittest 
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import split_nodes_delimiter, extract_markdown_links, extract_markdown_images
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_code(self):
@@ -68,4 +68,20 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         expected_exception = str(context.exception)
 
         self.assertIn("invalid markdown, delimiter is not closed", expected_exception)
+
+
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_one_image(self):
+        text = "This is markdown text with an image of a ![bad type of fish](https://www.lookoutforthisfish.com/fishes/gX4zq.jpeg)"
+        result = extract_markdown_images(text)
+        expected = [("bad type of fish", "https://www.lookoutforthisfish.com/fishes/gX4zq.jpeg")]
+        
+        self.assertListEqual(result, expected)
+
+    def test_multiple_image(self):
+        text = "More text with image of ![wrongway fellow](https://www.guywhoisalwaysgoingthewrongway.com/nogood.jpg) and image of ![water in showercap](http://www.ifthirstyhaveadrink.com/delicious.jpeg), and that's all"
+        result = extract_markdown_images(text)
+        expected = [("wrongway fellow", "https://www.guywhoisalwaysgoingthewrongway.com/nogood.jpg"), ("water in showercap", "http://www.ifthirstyhaveadrink.com/delicious.jpeg")]
+
+        self.assertListEqual(result, expected)
 
