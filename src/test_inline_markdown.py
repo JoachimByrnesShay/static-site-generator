@@ -61,3 +61,11 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
         self.assertListEqual(expected, result)
 
+    def test_raise_exception_with_unclosed_delimiter(self):
+        node = TextNode("I don't like this text because the **bold delimiter is not closed, you see?", TextType.TEXT)
+        with self.assertRaises(Exception) as context:
+            split_nodes_delimiter([node], "**", TextType.BOLD)
+        expected_exception = str(context.exception)
+
+        self.assertIn("invalid markdown, delimiter is not closed", expected_exception)
+
