@@ -40,3 +40,24 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         ]
 
         self.assertEqual(result, expected)
+
+    def test_code_start_of_string(self):
+        node = TextNode("`This is code at start of text` and the rest of this stuff isn't", TextType.TEXT)
+        result = split_nodes_delimiter([node], "`", TextType.CODE)
+        expected = [
+            TextNode("This is code at start of text", TextType.CODE),
+            TextNode(" and the rest of this stuff isn't", TextType.TEXT)
+        ]
+
+        self.assertListEqual(expected, result)
+
+    def test_italic_end_of_string(self):
+        node = TextNode("So far we have only regular text but in a second we have _way too much italic text_", TextType.TEXT)
+        result = split_nodes_delimiter([node], "_", TextType.ITALIC)
+        expected = [
+            TextNode("So far we have only regular text but in a second we have ", TextType.TEXT),
+            TextNode("way too much italic text", TextType.ITALIC),
+        ]
+
+        self.assertListEqual(expected, result)
+
