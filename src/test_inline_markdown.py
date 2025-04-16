@@ -85,3 +85,46 @@ class TestExtractMarkdownImages(unittest.TestCase):
 
         self.assertListEqual(result, expected)
 
+    def test_no_image_if_its_a_link(self):
+        text = "This is markdown text with a link to a [fish](https://www.igoheretogetmyspecialfish.com/randomfish)"
+        result = extract_markdown_images(text)
+        expected = []
+
+        self.assertListEqual(result, expected)
+
+    def test_text_starts_with_image(self):
+        text = "![Ms. Ladi Walindera](http://www.suspectmanager.com/ladindera_p_walindera_posing_with_rooibos_tea_at_desk.jpg) is what you should be looking at and thinking about before you say anything else"
+        result = extract_markdown_images(text)
+        expected = [("Ms. Ladi Walindera", "http://www.suspectmanager.com/ladindera_p_walindera_posing_with_rooibos_tea_at_desk.jpg")]
+
+        self.assertListEqual(result, expected)
+
+
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_one_link(self):
+        text = "This is markdown text with a link to a [fish](https://www.igoheretogetmyspecialfish.com/randomfish)"
+        result = extract_markdown_links(text)
+        expected = [("fish", "https://www.igoheretogetmyspecialfish.com/randomfish")]
+
+        self.assertListEqual(result, expected)
+
+    def test_multiple_links(self):
+        text = "Link here to a [bad guy's webpage](https://www.awefulguy.com) and to a [mango](http://www.eatmorefruitthatnotanapple.com/howaboutmango)"
+        result = extract_markdown_links(text)
+        expected = [("bad guy's webpage", "https://www.awefulguy.com"), ("mango", "http://www.eatmorefruitthatnotanapple.com/howaboutmango")]
+
+        self.assertListEqual(result, expected)
+
+    def test_no_link_if_its_an_image(self):
+        text = "Link here to ![bad guy's mango](https://www.notreallymineistoleit.com/kidsmango), ok?"
+        result = extract_markdown_links(text)
+        expected = []
+
+        self.assertListEqual(result, expected)
+
+    def test_text_starts_with_link(self):
+        text = "[water](https://www.maybedisappointing.com/itsjustwater), ok?  I wanted you to check it out anyway."
+        result = extract_markdown_links(text)
+        expected = [("water", "https://www.maybedisappointing.com/itsjustwater")]
+
+        self.assertListEqual(result, expected)
