@@ -1,6 +1,6 @@
 import unittest 
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_code_block(self):
@@ -85,3 +85,24 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         
         expected_message = str(context.exception)
         self.assertIn("delimiter not closed", expected_message)
+
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_extract_images(self):
+        text = "This is an image of a ![bad-haired cat](https://www.mycatwillscratchandbiteifyoutrytofixitshair.com/7aOb5z.jpg) and this is the ![guy I saw standing near cat yesterday](https://www.weheartcats.com/in-memoriam/tony-'kc'-tunason.jpeg)"
+        result = extract_markdown_images(text)
+        expected = [("bad-haired cat", "https://www.mycatwillscratchandbiteifyoutrytofixitshair.com/7aOb5z.jpg"), ("guy I saw standing near cat yesterday", "https://www.weheartcats.com/in-memoriam/tony-'kc'-tunason.jpeg")]
+        self.assertEqual(result, expected)
+
+
+class TestExtractMarkdownLinks(unittest.TestCase):
+    def test_extract_links(self):
+        text = "This is a link to [where to find after-puddles](https://www.puddles.com/no-more-puddles-later) and [to rabbit skates](http://www.animalskates.com/self-rolling-for-difficult-animals/rabbits)"
+        result = extract_markdown_links(text)
+        expected = [("where to find after-puddles", "https://www.puddles.com/no-more-puddles-later"), ("to rabbit skates", "http://www.animalskates.com/self-rolling-for-difficult-animals/rabbits")]
+        self.assertEqual(result, expected)
+
+    def test_extract_no_links_if_image_syntax(self):
+        text = "This is an image of a ![bad-haired cat](https://www.mycatwillscratchandbiteifyoutrytofixitshair.com/7aOb5z.jpg) and this is the ![guy I saw standing near cat yesterday](https://www.weheartcats.com/in-memoriam/tony-'kc'-tunason.jpeg)"
+        result = extract_markdown_links(text)
+        expected = []
+        self.assertEqual(result, expected)
