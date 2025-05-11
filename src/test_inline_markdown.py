@@ -1,6 +1,6 @@
 import unittest 
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_link, split_nodes_image
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_code_block(self):
@@ -106,3 +106,39 @@ class TestExtractMarkdownLinks(unittest.TestCase):
         result = extract_markdown_links(text)
         expected = []
         self.assertEqual(result, expected)
+
+class TestSplitNodesLink(unittest.TestCase):
+    def test_two_links(self):
+        node = TextNode(
+            "This is text with a link [to a surfboard's homepage](https://www.jonnysurfboard.com/aboutme) and [to some unused articles](https://www.youllneverfindthem.com/cantusethem/articles)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("This is text with a link ", TextType.TEXT),
+            TextNode("to a surfboard's homepage", TextType.LINK, "https://www.jonnysurfboard.com/aboutme"),
+            TextNode(" and ", TextType.TEXT),
+            TextNode(
+                "to some unused articles", TextType.LINK, "https://www.youllneverfindthem.com/cantusethem/articles"
+            ),
+        ]
+        self.assertListEqual(new_nodes, expected)
+
+class TestSplitNodesImage(unittest.TestCase):
+    def test_two_images(self):
+        node = TextNode(
+            "This is text with an ![ocelot image](https://wildandcrazylifeimages.com/Az7f0.jpeg) and a ![garage door image](http://www.partsofabuilding.com/doors/garage/fJab9q.jpg)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        
+        expected = [ 
+            TextNode("This is text with an ", TextType.TEXT),
+            TextNode("ocelot image", TextType.IMAGE, "https://wildandcrazylifeimages.com/Az7f0.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("garage door image", TextType.IMAGE, "http://www.partsofabuilding.com/doors/garage/fJab9q.jpg"),
+        ]
+        self.assertEqual(
+            expected,
+            new_nodes,
+        )
