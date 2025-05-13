@@ -124,6 +124,23 @@ class TestSplitNodesLink(unittest.TestCase):
         ]
         self.assertListEqual(new_nodes, expected)
 
+    def test_text_starts_with_link(self):
+        node = TextNode(
+            "[early link guy](https://www.firstinmarkdownstring.com/checkitout) is a good link to look at", TextType.TEXT
+        )
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("early link guy", TextType.LINK, "https://www.firstinmarkdownstring.com/checkitout"),
+            TextNode(" is a good link to look at", TextType.TEXT),
+        ]
+        self.assertListEqual(new_nodes, expected)
+
+    def test_does_not_capture_images(self):
+        node = TextNode("this is not a link but some guy thinks it is and is about to click it, always watch out for ![pic of sad guy at desk](http://www.fooledagain.com/brown-hair-blue-slacks-guy/itsreallyhim)", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        expected = [node]
+        self.assertListEqual(new_nodes, expected)
+
 class TestSplitNodesImage(unittest.TestCase):
     def test_two_images(self):
         node = TextNode(
@@ -142,3 +159,23 @@ class TestSplitNodesImage(unittest.TestCase):
             expected,
             new_nodes,
         )
+    
+    def test_text_starts_with_image(self):
+        node = TextNode("![coffee bird](http://www.womanlefthercoffee.com/outsidetable/birdcome/lovesit-pigeon/5yUp9.jpg) is a picture of a crazed bird with high heart rate and nervous pacing", TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+
+        expected = [
+            TextNode("coffee bird", TextType.IMAGE, "http://www.womanlefthercoffee.com/outsidetable/birdcome/lovesit-pigeon/5yUp9.jpg"),
+            TextNode(" is a picture of a crazed bird with high heart rate and nervous pacing", TextType.TEXT)
+        ]
+        self.assertEqual(
+            expected,
+            new_nodes
+        )
+                    
+    def test_does_not_capture_links(self):
+        node = TextNode("this is suposed to be an image but it really isn't, [not an image, its a link](https://dontclickonit.com/itssupposedtobeanimage/59.png)", TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+
+        expected = [node]
+        self.assertListEqual(new_nodes, expected)
