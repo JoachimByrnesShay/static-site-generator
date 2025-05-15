@@ -1,6 +1,6 @@
 import unittest 
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_link, split_nodes_image
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_link, split_nodes_image, text_to_textnodes
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_code_block(self):
@@ -14,8 +14,8 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         self.assertEqual(new_nodes, expected)
 
     def test_italic_multiple_blocks(self):
-        node = TextNode("This is an __italic block__ and this is another one of those __italic things here__, ok?", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "__", TextType.ITALIC)
+        node = TextNode("This is an _italic block_ and this is another one of those _italic things here_, ok?", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
         expected = [
             TextNode("This is an ", TextType.TEXT),
             TextNode("italic block", TextType.ITALIC),
@@ -50,9 +50,9 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
 
     def test_bold_and_italic_blocks(self):
-        node = TextNode("Hi, this is **bold stuff here** and over here is some __spicy italic stuff__, ok?  is that fine with you?", TextType.TEXT)
+        node = TextNode("Hi, this is **bold stuff here** and over here is some _spicy italic stuff_, ok?  is that fine with you?", TextType.TEXT)
         new_bold_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-        bold_with_new_italic_nodes = split_nodes_delimiter([*new_bold_nodes], "__", TextType.ITALIC)
+        bold_with_new_italic_nodes = split_nodes_delimiter([*new_bold_nodes], "_", TextType.ITALIC)
         expected = [
             TextNode("Hi, this is ", TextType.TEXT),
             TextNode("bold stuff here", TextType.BOLD),
@@ -64,9 +64,9 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
     def test_multiple_nodes(self):
         node1 = TextNode("Hi this is **bold text block here** and it is good", TextType.TEXT)
-        node2 = TextNode("Hi this is an __italic text block here__ and it is very very good", TextType.TEXT)
+        node2 = TextNode("Hi this is an _italic text block here_ and it is very very good", TextType.TEXT)
         new_bold_nodes = split_nodes_delimiter([node1, node2], "**", TextType.BOLD)
-        bold_with_new_italic_nodes = split_nodes_delimiter([*new_bold_nodes], "__", TextType.ITALIC)
+        bold_with_new_italic_nodes = split_nodes_delimiter([*new_bold_nodes], "_", TextType.ITALIC)
         expected = [
             TextNode("Hi this is ", TextType.TEXT),
             TextNode("bold text block here", TextType.BOLD),
@@ -78,7 +78,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         self.assertEqual(bold_with_new_italic_nodes, expected)
 
     def test_raise_correct_exception_with_unclosed_delimiter(self):
-        node = TextNode("this is some very bad markdown attempt text with what is supposed to be **bold__, but it isn't.  Sorry.", TextType.TEXT)
+        node = TextNode("this is some very bad markdown attempt text with what is supposed to be **bold_, but it isn't.  Sorry.", TextType.TEXT)
 
         with self.assertRaises(Exception) as context:
             new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
@@ -135,6 +135,16 @@ class TestSplitNodesLink(unittest.TestCase):
         ]
         self.assertListEqual(new_nodes, expected)
 
+    def test_one_link_and_at_end(self):
+        text = "and a [link](https://boot.dev)"
+        node = TextNode(text, TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev")
+        ]
+        self.assertListEqual(new_nodes, expected)
+
     def test_does_not_capture_images(self):
         node = TextNode("this is not a link but some guy thinks it is and is about to click it, always watch out for ![pic of sad guy at desk](http://www.fooledagain.com/brown-hair-blue-slacks-guy/itsreallyhim)", TextType.TEXT)
         new_nodes = split_nodes_link([node])
@@ -179,3 +189,30 @@ class TestSplitNodesImage(unittest.TestCase):
 
         expected = [node]
         self.assertListEqual(new_nodes, expected)
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_with_one_link_at_end(self):
+        text = "and a [link](https://www.theotherguysaremoresoyahoos.com)"
+        nodes = text_to_textnodes(text)
+        expected = [
+            TextNode("and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://www.theotherguysaremoresoyahoos.com")
+        ]
+        self.assertListEqual(nodes, expected)
+
+    def test_with_multiple_blocks_different_delimiters(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://www.shoppingforstuff.com)"
+        nodes = text_to_textnodes(text)
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://www.shoppingforstuff.com"),
+        ]
+        self.assertListEqual(nodes, expected)
