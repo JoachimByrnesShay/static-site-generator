@@ -1,6 +1,7 @@
 import unittest 
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_link, split_nodes_image, text_to_textnodes
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links,\
+    split_nodes_link, split_nodes_image, text_to_textnodes, markdown_to_blocks
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_code_block(self):
@@ -216,3 +217,31 @@ class TestTextToTextNodes(unittest.TestCase):
             TextNode("link", TextType.LINK, "https://www.shoppingforstuff.com"),
         ]
         self.assertListEqual(nodes, expected)
+
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_markdown_to_blocks(self):
+        md = """
+This is _italic content_ in a paragraph
+
+This is a paragraph with **bold text** and `a lot of code` here
+This is a new line in the same paragraph
+
+- This is a list
+- with items
+- and with more items here
+
+# this is a heading
+## and this is continuation of the heading block with another heading
+"""
+        blocks = markdown_to_blocks(md)
+
+        self.assertEqual(
+            blocks,
+            [
+                "This is _italic content_ in a paragraph",
+                "This is a paragraph with **bold text** and `a lot of code` here\nThis is a new line in the same paragraph",
+                "- This is a list\n- with items\n- and with more items here",
+                "# this is a heading\n## and this is continuation of the heading block with another heading"
+            ],
+        )

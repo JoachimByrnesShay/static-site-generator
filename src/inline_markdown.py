@@ -84,3 +84,9 @@ def text_to_textnodes(text):
     with_images = split_nodes_image(with_code_nodes)
     all_with_links = split_nodes_link(with_images)
     return all_with_links
+
+
+def markdown_to_blocks(markdown):
+    blocks = list(filter(lambda x: x, map(lambda x: x.strip(), markdown.split("\n\n"))))
+    return blocks
+    
